@@ -5,17 +5,22 @@ import Login from "./login/login";
 import HomePage from "./pages/HomePage"; // Create a new component for the second page
 
 function App() {
+  const token = Cookies.get("authToken");
+
   return (
     <Router>
-      {/* <nav>
-        <Link to="/login" style={{ marginRight: "10px" }}>
-          Go to Login
-        </Link>
-        <Link to="/home">Go to Home</Link>
-      </nav> */}
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<HomePage />} />
+        {/* Redirect to home page if token exists */}
+        <Route
+          path="/login"
+          element={token ? <Navigate to="/home" /> : <Login />}
+        />
+
+        {/* Home page route */}
+        <Route
+          path="/home"
+          element={token ? <HomePage /> : <Navigate to="/login" />}
+        />
       </Routes>
     </Router>
   );
