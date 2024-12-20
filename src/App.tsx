@@ -16,16 +16,10 @@ function App() {
     <Router>
       <Routes>
         {/* Redirect to home page if token exists */}
-        <Route
-          path="/login"
-          element={token ? <Navigate to="/home" /> : <Login />}
-        />
+        <Route path="/login" element={<Login />} />
 
         {/* Home page route */}
-        <Route
-          path="/home"
-          element={token ? <HomePage /> : <Navigate to="/login" />}
-        />
+        <Route path="/home" element={<HomePage />} />
       </Routes>
     </Router>
   );

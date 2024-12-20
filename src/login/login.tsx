@@ -4,8 +4,10 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
-import axios from "axios";
-import Cookies from "js-cookie"; // Import js-cookie
+// import axios from "axios";
+// import Cookies from "js-cookie"; // Import js-cookie
+// import { useNavigate, useRoutes } from "react-router-dom";
+import useLogin from "../hooks/useLogin";
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,49 +15,21 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState(""); // Track password input
   const [errorMessage, setErrorMessage] = useState(""); // Track error message
 
+  const { login } = useLogin();
+
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_REACT_APP_API_URL}/api/login/webAppLogin`,
-        {
-          userName: email,
-          password: password,
-        }
-      );
-
-      const { token } = response.data.ResultData[0];
-      if (token) {
-        Cookies.set("authToken", token, { expires: 7 });
-        alert("Login successful!");
-        // Redirect or handle success
-      } else {
-        setErrorMessage("Invalid credentials");
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("Axios Error Response:", error.response); // Log the error response
-        setErrorMessage(
-          "An error occurred while logging in. Please check your network or try again later."
-        );
-      } else {
-        console.error("General Error:", error);
-        setErrorMessage(
-          "An unexpected error occurred. Please try again later."
-        );
-      }
-    }
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    login(email, password); // Call login function
   };
 
   return (
     <div className={styles.loginContainer}>
       <div className={styles.loginCard}>
         <img
-          src="/public/image/WizaEvoveLogo.png"
+          src="/public/image/WizaEvove.png"
           alt="Wiza Logo"
           className={styles.loginLogo}
         />

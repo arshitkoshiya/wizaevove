@@ -1,0 +1,33 @@
+.mainDialog {
+  border-radius: 80px !important;
+  padding: 1em;
+}
+.CloseButton {
+  border-radius: 10px !important;
+  color: black !important;
+  background-color: #f5f6fa !important;
+}
+.submitButton {
+  margin-right: 15px !important;
+  color: white !important;
+  background-color: red !important;
+  border-radius: 10px !important;
+}
+.textField {
+  border-radius: 10px !important;
+}
+.dialogTitle {
+  text-align: center !important;
+  color: black !important;
+  font-weight: bold !important;
+  border-radius: 10px !important;
+  font-size: 1.2rem !important;
+  background-color: #f5f6fa !important;
+}
+
+/* Make the layout responsive */
+@media (max-width: 768px) {
+  .gridContainer {
+    grid-template-columns: 1fr; /* Stack the fields on smaller screens */
+  }
+}

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 // Define TypeScript types for event data
 interface Event {
@@ -45,7 +45,7 @@ const useFetchAllEvents = (page: number = 1, size: number = 5) => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get<FetchEventsResponse>(
-          `http://10.37.57.113:8080/api/events/getAllEvents?page=${page}&limit=${size}`
+          `${import.meta.env.VITE_REACT_APP_API_URL}/api/events/getAllEvents?page=${page}&limit=${size}`
         );
         setEvents(response.data.data.events); // Set the events data
         setPagination(response.data.data.pagination); // Set pagination data
