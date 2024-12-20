@@ -1,9 +1,10 @@
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
   Button,
   Typography,
-  Container,
+  CircularProgress,
   Table,
   TableBody,
   TableCell,
@@ -11,26 +12,41 @@ import {
   TableHead,
   TableRow,
   Paper,
-  CircularProgress,
 } from "@mui/material";
+import { Logout } from "@mui/icons-material"; // Import Logout icon from Material UI
+import Cookies from "js-cookie";
 import styles from "./homepage.module.css";
 import useFetchAllEvents from "../hooks/useFetchAllEvents";
-
-// Sample data for the table
-const rows = [
-  { id: 1, name: "John Doe", age: 28, job: "Software Engineer" },
-  { id: 2, name: "Jane Smith", age: 34, job: "Product Manager" },
-  { id: 3, name: "Sam Johnson", age: 22, job: "Designer" },
-];
+import CreateModel from "../models/createModel";
 
 const HomePage = () => {
   const { events, loading, error } = useFetchAllEvents();
+  const [openModal, setOpenModal] = useState(false); // Modal open state
 
-  if (loading) return <CircularProgress />; // Show loading spinner while data is being fetched
+  const handleModalClose = () => {
+    setOpenModal(false); // Close the modal
+  };
+
+  const handleModalOpen = () => {
+    setOpenModal(true); // Open the modal
+  };
+
+  const handleCreateEvent = (eventData: {
+    name: string;
+    location: string;
+    fromDate: Date;
+    toDate: Date;
+    fromTime: string;
+    toTime: string;
+    typeOfEvent: string;
+    eventImage: string | File;
+  }) => {};
+
+  if (loading) return <CircularProgress />;
   if (error) return <div>Error: {error}</div>;
+
   return (
     <div>
-      {/* Top bar with logo and button */}
       <AppBar
         position="sticky"
         className={styles.appBar}
@@ -41,25 +57,43 @@ const HomePage = () => {
       >
         <Toolbar className={styles.toolbar}>
           <img
-            src="/img/Wiza-Logo.png"
+            src="/image/WizaEvove.PNG"
             alt="Wiza Logo"
             className="login-logo"
-            height={45}
-            width={25}
+            height={50}
+            width={130}
             style={{ margin: 0 }}
           />
-          <Button color="inherit" className={styles.button}>
-            My Button
+          <Button
+            color="inherit"
+            className={styles.logoutButton}
+            onClick={() => Cookies.remove("authToken")}
+            startIcon={<Logout />}
+          >
+            déconnecter
           </Button>
         </Toolbar>
       </AppBar>
-      {/* Text Section */}
-      <div className={styles.main_container}>
-        <Typography variant="h5" gutterBottom>
-          Liste de tous les <span style={{ color: "red" }}>événements</span>
-        </Typography>
 
-        {/* Material UI Table */}
+      <div className={styles.main_container}>
+        <div className={styles.mainHeader}>
+          <Typography variant="h5" gutterBottom>
+            Liste de tous les <span style={{ color: "red" }}>événements</span>
+          </Typography>
+          <div>
+            <Button
+              variant="contained"
+              className={styles.createButton}
+              onClick={handleModalOpen}
+            >
+              créer un événement
+            </Button>
+            <Button variant="contained" className={styles.expoterButtons}>
+              Exporter
+            </Button>
+          </div>
+        </div>
+
         <TableContainer component={Paper} className={styles.tableContainer}>
           <Table>
             <TableHead>
@@ -70,7 +104,6 @@ const HomePage = () => {
                 <TableCell>From Date</TableCell>
                 <TableCell>To Date</TableCell>
                 <TableCell>Status</TableCell>
-                {/* <TableCell>Event Image</TableCell> */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -90,19 +123,18 @@ const HomePage = () => {
                     }`}
                   </TableCell>
                   <TableCell>{event.status}</TableCell>
-                  {/* <TableCell>
-                    <img
-                      src={event.eventImage}
-                      alt={event.nameOfEvent}
-                      width="100"
-                    />
-                  </TableCell> */}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
       </div>
+
+      <CreateModel
+        open={openModal}
+        onClose={handleModalClose}
+        onCreate={handleCreateEvent}
+      />
     </div>
   );
 };
