@@ -1,0 +1,68 @@
+/* MyPage.module.css */
+
+.appBar{
+  background-color: #c6d360;
+  height: 7vh;
+  display: flex;
+  padding: 10px;
+  justify-content: center;
+
+}
+
+.button {
+  color: white; /* Change the button color */
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.logoText {
+  flex-grow: 1;
+}
+
+
+
+/* MyPage.module.css */
+
+.main_container{
+    margin: 30px;
+}
+
+.tableContainer {
+    margin-top: 20px;
+    border-radius: 8px; /* Optional: Round the table corners */
+    overflow: hidden; /* Ensures that rounded corners are not cut off */
+  }
+  
+  .table {
+    width: 100%;
+    border-collapse: collapse; /* Ensures borders don't overlap */
+  }
+  
+  .tableHead {
+    background-color: #1976d2; /* Header background color */
+    color: white;
+  }
+  
+  .tableRow {
+    &:hover {
+      background-color: #f5f5f5; /* Row hover color */
+    }
+  }
+  
+  .tableCell {
+    padding: 16px;
+    border-bottom: 1px solid #ddd; /* Add border between rows */
+  }
+  
+  .tableBody {
+    background-color: #fafafa; /* Body background color */
+  }
+  
+  .tableFooter {
+    background-color: #1976d2; /* Footer background color */
+    color: white;
+  }
+  

@@ -1,4 +1,4 @@
-/* General container for centering */
+General container for centering
 .login-container {
   display: flex;
   justify-content: center;
