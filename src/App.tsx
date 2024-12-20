@@ -1,6 +1,11 @@
 // App.js
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Cookies from "js-cookie"; // Import js-cookie
 import Login from "./login/login";
 import HomePage from "./pages/HomePage"; // Create a new component for the second page
 
