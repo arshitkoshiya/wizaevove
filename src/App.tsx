@@ -6,7 +6,6 @@ import {
   Navigate,
 } from "react-router-dom";
 import Cookies from "js-cookie"; // Import js-cookie
-import "./App.css";
 import Login from "./login/login";
 import HomePage from "./pages/HomePage"; // Create a new component for the second page
 

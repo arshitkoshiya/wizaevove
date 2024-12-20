@@ -55,7 +55,7 @@ const Login: React.FC = () => {
     <div className={styles.loginContainer}>
       <div className={styles.loginCard}>
         <img
-          src="logo-placeholder.png"
+          src="/public/image/WizaEvoveLogo.png"
           alt="Wiza Logo"
           className={styles.loginLogo}
         />
