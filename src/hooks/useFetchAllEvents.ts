@@ -30,16 +30,25 @@ interface FetchEventsResponse {
   };
 }
 
-const useFetchAllEvents = () => {
+const useFetchAllEvents = (page: number = 1, size: number = 5) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 0,
+    totalItems: 0,
+    pageSize: size,
+  });
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get<FetchEventsResponse>('http://10.37.57.113:8080/api/events/getAllEvents');
+        const response = await axios.get<FetchEventsResponse>(
+          `http://10.37.57.113:8080/api/events/getAllEvents?page=${page}&limit=${size}`
+        );
         setEvents(response.data.data.events); // Set the events data
+        setPagination(response.data.data.pagination); // Set pagination data
       } catch (err: any) {
         setError(err.message); // Set error message if request fails
       } finally {
@@ -48,9 +57,9 @@ const useFetchAllEvents = () => {
     };
 
     fetchEvents();
-  }, []); // Empty dependency array to only fetch once when the component mounts
+  }, [page, size]); // Re-fetch events when `page` or `size` changes
 
-  return { events, loading, error };
+  return { events, loadingEvents : loading, errorOnFetchEvent : error, pagination };
 };
 
 export default useFetchAllEvents;
