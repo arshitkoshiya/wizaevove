@@ -45,7 +45,7 @@ const useFetchAllEvents = (page: number = 1, limit: number = 10) => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get<FetchEventsResponse>(
-          `http://10.37.57.113:8080/api/events/getAllEvents?page=${page}&limit=${limit}`
+          `${import.meta.env.VITE_REACT_APP_API_URL}/api/events/getAllEvents?page=${page}&limit=${limit}`
         );
         setEventsData(response.data.data.events); // Set the events data
         setPagination(response.data.data.pagination); // Set pagination data

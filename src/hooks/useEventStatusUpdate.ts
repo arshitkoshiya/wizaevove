@@ -34,7 +34,7 @@ const useUpdateEventStatus = () => {
 
     try {
       const response = await axios.put<UpdateEventStatusResponse>(
-        `http://10.37.57.113:8080/api/events/eventStatusUpdate/${id}/${status}`
+        `${import.meta.env.VITE_REACT_APP_API_URL}/api/events/eventStatusUpdate/${id}/${status}`
       );
       return response.data.ResultData[0];
     } catch (err: any) {

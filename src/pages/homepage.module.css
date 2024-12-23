@@ -2,7 +2,8 @@
 .appBar {
   background-color: #f5f6fd !important;
   color: black !important;
-/* MyPage.module.css */
+  --Paper-shadow : none !important;
+  /* MyPage.module.css */
 }
 
 
@@ -142,6 +143,7 @@
 .mainHeader {
   display: flex;
   justify-content: space-between;
+  width: -webkit-fill-available;
 }
 .expoterButtons {
   border-radius: 10px !important;

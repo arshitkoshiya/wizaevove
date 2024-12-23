@@ -20,12 +20,17 @@ import {
 import { Logout } from "@mui/icons-material"; // Import Logout icon from Material UI
 import Cookies from "js-cookie";
 import styles from "./homepage.module.css";
-import useFetchAllEvents, { Event } from "../hooks/useFetchAllEvents";
+import useFetchAllEvents from "../hooks/useFetchAllEvents";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import WestIcon from "@mui/icons-material/West";
 import EastIcon from "@mui/icons-material/East";
 import useUpdateEventStatus from "../hooks/useEventStatusUpdate";
 import CreateModel from "../models/createModel";
+import useFetchEventById, { Event } from "../hooks/useGetEventById";
+import SnackbarNotification from "../components/SnackbarNotification";
+import useSnackbar from "../hooks/useSnackbar";
+import { useNavigate, useRoutes } from "react-router-dom";
+import DownloadExcel from "../components/DownloadExcel";
 
 // Styled Components
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
@@ -80,33 +85,40 @@ const CircularButton = styled(Button)<{ colorType: "primary" | "warning" }>(
 const HomePage = () => {
   const [openModal, setOpenModal] = useState(false); // Modal open state
   const [events, setEvents] = useState<Event[]>([]); // Modal open state
+  const [type, setType] = useState<string>("Create");
+  const router = useNavigate();
+
+  const { fetchEventById, eventData } = useFetchEventById();
+  const { snackbarState, showSnackbar, closeSnackbar } = useSnackbar();
 
   const handleModalClose = () => {
     setOpenModal(false); // Close the modal
   };
 
-  const handleModalOpen = () => {
+  const handleModalOpen = (type: string, id?: string) => {
+    setType(type);
     setOpenModal(true); // Open the modal
-  };
 
-  const handleCreateEvent = (eventData: {
-    name: string;
-    location: string;
-    fromDate: Date;
-    toDate: Date;
-    fromTime: string;
-    toTime: string;
-    typeOfEvent: string;
-    eventImage: string | File;
-  }) => {};
+    if (type == "Edit") {
+      fetchEventById(id || "");
+    }
+  };
 
   const [page, setPage] = useState(1);
   const { eventsData, loadingEvents, errorOnFetchEvent, pagination } =
-    useFetchAllEvents(page, 10); // Pass the page and limit
+    useFetchAllEvents(page, 8); // Pass the page and limit
 
-  const { updateEventStatus, loading, error } = useUpdateEventStatus();
+  const { updateEventStatus, error } = useUpdateEventStatus();
 
-  const [state, setState] = useState<"start" | "end">("start");
+  const handleCreateEvent = (eventData: any) => {
+    if (eventData) {
+      setEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event._id === eventData.eventId ? { ...event, ...eventData } : event
+        )
+      );
+    }
+  };
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -122,6 +134,9 @@ const HomePage = () => {
 
       // Update the local UI state (optional: refetch events or directly modify state)
       // For example:
+      if (!res) {
+        showSnackbar("No users registered for this event", "error");
+      }
       if (res) {
         setEvents((prevEvents) =>
           prevEvents.map((event) =>
@@ -165,7 +180,11 @@ const HomePage = () => {
           <Button
             color="inherit"
             className={styles.logoutButton}
-            onClick={() => Cookies.remove("authToken")}
+            onClick={() => {
+              Cookies.remove("authToken");
+              showSnackbar("logout success", "success");
+              router("/");
+            }}
             startIcon={<Logout />}
           >
             déconnecter
@@ -182,13 +201,14 @@ const HomePage = () => {
             <Button
               variant="contained"
               className={styles.createButton}
-              onClick={handleModalOpen}
+              onClick={() => handleModalOpen("Create")}
             >
               créer un événement
             </Button>
-            <Button variant="contained" className={styles.expoterButtons}>
+            {/* <Button variant="contained" className={styles.expoterButtons}>
               Exporter
-            </Button>
+            </Button> */}
+            <DownloadExcel />
           </div>
         </div>
 
@@ -234,7 +254,11 @@ const HomePage = () => {
                           ? "primary"
                           : "warning"
                       } // Adjust button color dynamically
-                      onClick={() => handleClick(event._id, event.status)} // Pass event ID and status to handleClick
+                      onClick={() => {
+                        if (event._id && event.status) {
+                          handleClick(event?._id, event.status);
+                        }
+                      }} // Pass event ID and status to handleClick
                       disabled={event.status === "Completed"} // Disable button if status is 'completed'
                     >
                       {event.status === "Scheduled"
@@ -247,7 +271,9 @@ const HomePage = () => {
                   </CustomTableCellAction>
 
                   <CustomTableCellAction>
-                    <BorderColorIcon />
+                    <BorderColorIcon
+                      onClick={() => handleModalOpen("Edit", event._id)}
+                    ></BorderColorIcon>
                   </CustomTableCellAction>
                 </TableRow>
               ))}
@@ -296,7 +322,15 @@ const HomePage = () => {
       <CreateModel
         open={openModal}
         onClose={handleModalClose}
-        onCreate={handleCreateEvent}
+        onActionComplete={handleCreateEvent}
+        type={type}
+        event={eventData || undefined}
+      />
+      <SnackbarNotification
+        message={snackbarState.message}
+        severity={snackbarState.severity}
+        open={snackbarState.open}
+        onClose={closeSnackbar}
       />
     </div>
   );
