@@ -4,7 +4,7 @@ import axios from "axios";
 // Define TypeScript types for the response
 interface UpdateEventStatusResponse {
   message: string;
-  data: Event;
+  ResultData: Event[];
 }
 
 interface Event {
@@ -26,7 +26,6 @@ interface Event {
 const useUpdateEventStatus = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [updatedEvent, setUpdatedEvent] = useState<Event | null>(null);
 
   // Function to update the status
   const updateEventStatus = async (id: string, status: string) => {
@@ -37,8 +36,7 @@ const useUpdateEventStatus = () => {
       const response = await axios.put<UpdateEventStatusResponse>(
         `http://10.37.57.113:8080/api/events/eventStatusUpdate/${id}/${status}`
       );
-      console.log("response", response.data.data);
-      setUpdatedEvent(response.data.data); // Set the updated event data
+      return response.data.ResultData[0];
     } catch (err: any) {
       setError(
         err.message || "An error occurred while updating the event status"
@@ -48,7 +46,7 @@ const useUpdateEventStatus = () => {
     }
   };
 
-  return { updateEventStatus, loading, error, updatedEvent };
+  return { updateEventStatus, loading, error };
 };
 
 export default useUpdateEventStatus;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -20,7 +20,7 @@ import {
 import { Logout } from "@mui/icons-material"; // Import Logout icon from Material UI
 import Cookies from "js-cookie";
 import styles from "./homepage.module.css";
-import useFetchAllEvents from "../hooks/useFetchAllEvents";
+import useFetchAllEvents, { Event } from "../hooks/useFetchAllEvents";
 import BorderColorIcon from "@mui/icons-material/BorderColor";
 import WestIcon from "@mui/icons-material/West";
 import EastIcon from "@mui/icons-material/East";
@@ -61,21 +61,25 @@ const CustomTableCellActionHeader = styled(TableCell)(({ theme }) => ({
   border: "none",
 }));
 
-// Styled Button for Circular Shape
-const CircularButton = styled(Button)<{ colorType: "start" | "end" }>(
+const CircularButton = styled(Button)<{ colorType: "primary" | "warning" }>(
   ({ colorType }) => ({
     borderRadius: "5px",
     width: "40px",
     height: "15px",
     padding: "15px",
     fontSize: "10px",
-    backgroundColor: colorType === "start" ? "#A6FFB3" : "#FF7575",
-    color: colorType === "start" ? "black" : "white",
+    backgroundColor: colorType === "primary" ? "#A6FFB3" : "#FF7575",
+    color: colorType === "primary" ? "black" : "white",
+    "&:disabled": {
+      backgroundColor: "#e0e0e0", // Gray background for disabled state
+      color: "#9e9e9e", // Light gray text for disabled state
+    },
   })
 );
 
 const HomePage = () => {
   const [openModal, setOpenModal] = useState(false); // Modal open state
+  const [events, setEvents] = useState<Event[]>([]); // Modal open state
 
   const handleModalClose = () => {
     setOpenModal(false); // Close the modal
@@ -97,11 +101,10 @@ const HomePage = () => {
   }) => {};
 
   const [page, setPage] = useState(1);
-  const { events, errorOnFetchEvent, loadingEvents, pagination } =
-    useFetchAllEvents(page, 8);
+  const { eventsData, loadingEvents, errorOnFetchEvent, pagination } =
+    useFetchAllEvents(page, 10); // Pass the page and limit
 
-  const { updateEventStatus, updatedEvent, loading, error } =
-    useUpdateEventStatus();
+  const { updateEventStatus, loading, error } = useUpdateEventStatus();
 
   const [state, setState] = useState<"start" | "end">("start");
 
@@ -112,12 +115,30 @@ const HomePage = () => {
     setPage(value); // Update page when user clicks on pagination
   };
 
-  const handleClick = (id: string, status: string) => {
-    updateEventStatus(id, status).then(() => {
-      console.log("updatedEvent ", updatedEvent);
-    });
-    setState((prevState) => (prevState === "start" ? "end" : "start"));
+  const handleClick = async (eventId: string, currentStatus: string) => {
+    // Call backend to update event status
+    try {
+      const res = await updateEventStatus(eventId, currentStatus); // Assume this function updates the event status
+
+      // Update the local UI state (optional: refetch events or directly modify state)
+      // For example:
+      if (res) {
+        setEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event._id === eventId ? { ...event, status: res.status } : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update event status:", error);
+    }
   };
+
+  useEffect(() => {
+    if (eventsData) {
+      setEvents(eventsData);
+    }
+  }, [eventsData]);
 
   if (loadingEvents) return <CircularProgress />;
   if (errorOnFetchEvent) return <div>Error: {error}</div>;
@@ -206,14 +227,25 @@ const HomePage = () => {
                   </TableCellData>
                   <CustomTableCellAction>
                     <CircularButton
-                      colorType={state}
-                      onClick={() => {
-                        handleClick(event._id, event.status);
-                      }}
+                      colorType={
+                        event.status === "Ongoing"
+                          ? "warning"
+                          : event.status === "Scheduled"
+                          ? "primary"
+                          : "warning"
+                      } // Adjust button color dynamically
+                      onClick={() => handleClick(event._id, event.status)} // Pass event ID and status to handleClick
+                      disabled={event.status === "Completed"} // Disable button if status is 'completed'
                     >
-                      {state === "start" ? "Start" : "End"}
+                      {event.status === "Scheduled"
+                        ? "Start"
+                        : event.status === "Ongoing"
+                        ? "End"
+                        : "Ended"}{" "}
+                      {/* Dynamically set button text */}
                     </CircularButton>
                   </CustomTableCellAction>
+
                   <CustomTableCellAction>
                     <BorderColorIcon />
                   </CustomTableCellAction>

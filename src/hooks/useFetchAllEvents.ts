@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 // Define TypeScript types for event data
-interface Event {
+export interface Event {
   _id: string;
   nameOfEvent: string;
   location: string;
@@ -30,24 +30,24 @@ interface FetchEventsResponse {
   };
 }
 
-const useFetchAllEvents = (page: number = 1, size: number = 5) => {
-  const [events, setEvents] = useState<Event[]>([]);
+const useFetchAllEvents = (page: number = 1, limit: number = 10) => {
+  const [eventsData, setEventsData] = useState<Event[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
     totalItems: 0,
-    pageSize: size,
+    pageSize: limit,
   });
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const response = await axios.get<FetchEventsResponse>(
-          `${import.meta.env.VITE_REACT_APP_API_URL}/api/events/getAllEvents?page=${page}&limit=${size}`
+          `http://10.37.57.113:8080/api/events/getAllEvents?page=${page}&limit=${limit}`
         );
-        setEvents(response.data.data.events); // Set the events data
+        setEventsData(response.data.data.events); // Set the events data
         setPagination(response.data.data.pagination); // Set pagination data
       } catch (err: any) {
         setError(err.message); // Set error message if request fails
@@ -57,9 +57,14 @@ const useFetchAllEvents = (page: number = 1, size: number = 5) => {
     };
 
     fetchEvents();
-  }, [page, size]); // Re-fetch events when `page` or `size` changes
+  }, [page, limit]); // Re-fetch events when `page` or `limit` changes
 
-  return { events, loadingEvents : loading, errorOnFetchEvent : error, pagination };
+  return {
+    eventsData,
+    loadingEvents: loading,
+    errorOnFetchEvent: error,
+    pagination,
+  };
 };
 
 export default useFetchAllEvents;
