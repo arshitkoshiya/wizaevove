@@ -8,7 +8,7 @@ export default defineConfig({
   //   outDir: "build", // Customize the output directory
   // },
   server: {
-    host: "10.37.55.111", // Bind to all network interfaces
+    host: "10.37.55.112", // Bind to all network interfaces
     port: 5173, // Default Vite port (you can change this if needed)
     strictPort: false, // If you want Vite to throw an error if port is already in use
   },

@@ -37,7 +37,6 @@ const useUpdateEventStatus = () => {
       const response = await axios.put<UpdateEventStatusResponse>(
         `http://10.37.57.113:8080/api/events/eventStatusUpdate/${id}/${status}`
       );
-      console.log("response", response.data.data);
       setUpdatedEvent(response.data.data); // Set the updated event data
     } catch (err: any) {
       setError(

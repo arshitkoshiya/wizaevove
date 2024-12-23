@@ -26,6 +26,7 @@ import WestIcon from "@mui/icons-material/West";
 import EastIcon from "@mui/icons-material/East";
 import useUpdateEventStatus from "../hooks/useEventStatusUpdate";
 import CreateModel from "../models/createModel";
+import useFetchEventById, { Event } from "../hooks/useGetEventById";
 
 // Styled Components
 const CustomTableRow = styled(TableRow)(({ theme }) => ({
@@ -75,35 +76,35 @@ const CircularButton = styled(Button)<{ colorType: "start" | "end" }>(
 );
 
 const HomePage = () => {
-  const [openModal, setOpenModal] = useState(false); // Modal open state
+  const [openModal, setOpenModal] = useState(false);
+  const [type, setType] = useState<string>("Create");
+  const [state, setState] = useState<"start" | "end">("start");
+  const [page, setPage] = useState(1);
+
+  const { events, errorOnFetchEvent, loadingEvents, pagination } =
+    useFetchAllEvents(page, 8);
+
+  const { fetchEventById, eventData } = useFetchEventById();
+
+  const { updateEventStatus, updatedEvent, loading, error } =
+    useUpdateEventStatus();
 
   const handleModalClose = () => {
     setOpenModal(false); // Close the modal
   };
 
-  const handleModalOpen = () => {
+  const handleModalOpen = (type: string, id?: string) => {
+    setType(type);
     setOpenModal(true); // Open the modal
+
+    if (type == "Edit") {
+      fetchEventById(id || "");
+    }
   };
 
-  const handleCreateEvent = (eventData: {
-    name: string;
-    location: string;
-    fromDate: Date;
-    toDate: Date;
-    fromTime: string;
-    toTime: string;
-    typeOfEvent: string;
-    eventImage: string | File;
-  }) => {};
-
-  const [page, setPage] = useState(1);
-  const { events, errorOnFetchEvent, loadingEvents, pagination } =
-    useFetchAllEvents(page, 8);
-
-  const { updateEventStatus, updatedEvent, loading, error } =
-    useUpdateEventStatus();
-
-  const [state, setState] = useState<"start" | "end">("start");
+  const handleCreateEvent = (eventData: Event | any) => {
+    eventData ?? useFetchAllEvents(page, 8);
+  };
 
   const handlePageChange = (
     event: React.ChangeEvent<unknown>,
@@ -113,9 +114,7 @@ const HomePage = () => {
   };
 
   const handleClick = (id: string, status: string) => {
-    updateEventStatus(id, status).then(() => {
-      console.log("updatedEvent ", updatedEvent);
-    });
+    updateEventStatus(id, status).then(() => {});
     setState((prevState) => (prevState === "start" ? "end" : "start"));
   };
 
@@ -161,7 +160,7 @@ const HomePage = () => {
             <Button
               variant="contained"
               className={styles.createButton}
-              onClick={handleModalOpen}
+              onClick={() => handleModalOpen("Create")}
             >
               créer un événement
             </Button>
@@ -215,7 +214,9 @@ const HomePage = () => {
                     </CircularButton>
                   </CustomTableCellAction>
                   <CustomTableCellAction>
-                    <BorderColorIcon />
+                    <BorderColorIcon
+                      onClick={() => handleModalOpen("Edit", event._id)}
+                    ></BorderColorIcon>
                   </CustomTableCellAction>
                 </TableRow>
               ))}
@@ -265,6 +266,8 @@ const HomePage = () => {
         open={openModal}
         onClose={handleModalClose}
         onCreate={handleCreateEvent}
+        type={type}
+        event={eventData || undefined}
       />
     </div>
   );
